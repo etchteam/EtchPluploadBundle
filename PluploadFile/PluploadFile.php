@@ -2,6 +2,7 @@
 namespace Etch\PluploadBundle\PluploadFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * PlUploadFile class
@@ -54,6 +55,50 @@ class PluploadFile
         $this->setChunks($chunks);
         $this->setFilename($filename);
         $this->setTargetDirectory($targetDirectory);
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param string $tmpDir
+     * @param string $chunkParameter
+     * @param string $chunksParameter
+     * @param string $nameParameter
+     * @param string $fileParameter
+     * @return PluploadFile
+     */
+    static public function initAndProcessFromRequest(
+        Request $request,
+        $tmpDirSuffix,
+        $tmpDir = null,
+        $chunkParameter = 'chunk',
+        $chunksParameter = 'chunks',
+        $nameParameter = 'name',
+        $fileParameter = 'file'
+    )
+    {
+        if ($tmpDir === null) {
+            $tmpDir = rtrim(sys_get_temp_dir(), '/');
+        }
+
+        if ($tmpDirSuffix) {
+            $tmpDir = '/' . ltrim($tmpDirSuffix, '/');
+        }
+
+        $self = new static(
+            $request->request->get($chunkParameter) ?: $request->query->get($chunkParameter),
+            $request->request->get($chunksParameter) ?: $request->query->get($chunksParameter),
+            $request->request->get($nameParameter) ?: $request->query->get($nameParameter),
+            $tmpDir
+        );
+
+        if ($request->files->has($fileParameter)) {
+            // multipart
+            $self->processMultipartUpload($request->files->get($fileParameter));
+        } else {
+            $self->processStreamUpload();
+        }
+
+        return $self;
     }
 
     /**
