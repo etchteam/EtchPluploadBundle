@@ -81,7 +81,7 @@ class PluploadFile
         }
 
         if ($tmpDirSuffix) {
-            $tmpDir = '/' . ltrim($tmpDirSuffix, '/');
+            $tmpDir .= '/' . rtrim($tmpDirSuffix, '/');
         }
 
         $self = new static(
