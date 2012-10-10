@@ -1,0 +1,9 @@
+{
+    "name": "etch/plupload-bundle",
+    "type": "symfony-bundle",
+    "description": "Bundle to assist using plupload",
+    "autoload": {
+        "psr-0": { "Etch\\PluploadBundle": "" }
+    },
+    "target-dir": "Etch/PluploadBundle"
+}
